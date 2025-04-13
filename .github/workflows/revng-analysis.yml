@@ -32,7 +32,7 @@ jobs:
       - name: Run analysis
         run: |
           set -eux
-          perf record -F 99 -g -o perf.data -- revng --progress analyze --resume=revngworkspace revng-initial-auto-analysis beasts.exe
+          perf record -F 99 -g -o perf.data -- revng analyze --resume=revngworkspace revng-initial-auto-analysis patch.dll
           perf report -i perf.data > perf_report.txt
           perf script -i perf.data | FlameGraph/stackcollapse-perf.pl > out.perf-folded
           FlameGraph/flamegraph.pl out.perf-folded > flamegraph-analysis.svg
@@ -51,7 +51,7 @@ jobs:
       - name: Run decompilation
         run: |
           set -eux
-          perf record -F 99 -g -o perf.data -- revng --progress artifact --resume=revngworkspace decompile-to-single-file beasts.exe | revng ptml > decompiled.ptml
+          perf record -F 99 -g -o perf.data -- revng artifact --resume=revngworkspace decompile-to-single-file patch.dll | revng ptml > decompiled.ptml
           perf report -i perf.data > perf_report.txt
           perf script -i perf.data | FlameGraph/stackcollapse-perf.pl > out.perf-folded
           FlameGraph/flamegraph.pl out.perf-folded > flamegraph-decompile.svg
