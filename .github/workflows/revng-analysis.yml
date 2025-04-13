@@ -14,10 +14,16 @@ jobs:
 
       - name: Install RevNG
         run: |
+          df -h
+          sudo rm -rf /usr/local/lib/android
+          docker system prune -a -f --volumes
+          df -h
           cd
           curl -L -s https://rev.ng/downloads/revng-distributable/master/install.sh | bash
           echo "$HOME/revng" >> $GITHUB_PATH
-
+      - uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 32
       - name: Install Linux perf
         run: |
           set -eux
