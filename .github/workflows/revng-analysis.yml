@@ -1,0 +1,61 @@
+name: RevNG Analysis
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install RevNG
+        run: |
+          cd
+          curl -L -s https://rev.ng/downloads/revng-distributable/master/install.sh | bash
+          echo "$HOME/revng" >> $GITHUB_PATH
+
+      - name: Install Linux perf
+        run: |
+          set -eux
+          sudo apt update
+          sudo apt install -y linux-tools-common linux-tools-generic
+          # Ensure perf can be run without sudo
+          sudo sysctl -w kernel.perf_event_paranoid=0
+          sudo sysctl -w kernel.kptr_restrict=0
+
+          git clone --depth=1 https://github.com/brendangregg/FlameGraph.git
+
+      - name: Run analysis
+        run: |
+          set -eux
+          perf record -F 99 -g -- revng --progress analyze --resume=revngworkspace revng-initial-auto-analysis beasts.exe
+          perf script | FlameGraph/stackcollapse-perf.pl > out.perf-folded
+          FlameGraph/flamegraph.pl out.perf-folded > flamegraph-analysis.svg
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-results
+          path: |
+            revngworkspace/
+            flamegraph-analysis.svg
+
+      - name: Run decompilation
+        run: |
+          set -eux
+          perf record -F 99 -g -- revng --progress artifact --resume=revngworkspace decompile-to-single-file beasts.exe | revng ptml > decompiled.ptml
+          perf script | FlameGraph/stackcollapse-perf.pl > out.perf-folded
+          FlameGraph/flamegraph.pl out.perf-folded > flamegraph-decompile.svg
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompile-results
+          path: |
+            revngworkspace/
+            decompiled.ptml
+            flamegraph-decompile.svg
