@@ -23,7 +23,7 @@ jobs:
           echo "$HOME/revng" >> $GITHUB_PATH
       - uses: pierotofy/set-swap-space@master
         with:
-          swap-size-gb: 32
+          swap-size-gb: 64
       - name: Install Linux perf
         run: |
           set -eux
