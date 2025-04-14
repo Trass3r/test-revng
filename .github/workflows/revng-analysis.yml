@@ -16,7 +16,7 @@ jobs:
         run: |
           df -h
           sudo rm -rf /usr/local/lib/android
-          docker system prune -a -f --volumes
+          sudo apt autoremove -qq azure* dotnet* google* temurin* *-jre* '*llvm*' moby*
           df -h
           cd
           curl -L -s https://rev.ng/downloads/revng-distributable/master/install.sh | bash
@@ -35,6 +35,7 @@ jobs:
 
           git clone --depth=1 https://github.com/brendangregg/FlameGraph.git
 
+      - uses: catchpoint/workflow-telemetry-action@v2
       - name: Run analysis
         run: |
           set -eux
@@ -44,6 +45,7 @@ jobs:
           FlameGraph/flamegraph.pl out.perf-folded > flamegraph-analysis.svg
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: analysis-results
