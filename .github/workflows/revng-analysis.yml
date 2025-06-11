@@ -3,7 +3,7 @@ name: RevNG Analysis
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, schiffbruch ]
 
 jobs:
   analyze:
@@ -39,7 +39,9 @@ jobs:
       - name: Run analysis
         run: |
           set -eux
-          perf record -F 99 -g -o perf.data -- revng analyze --resume=revngworkspace revng-initial-auto-analysis DKII.EXE
+          sudo apt install -y wget 7zip
+          wget -nv -O - https://github.com/eXpl0it3r/Schiffbruch/releases/download/1.2.1/Schiffbruch-v1.2.1.7z | 7za e -si
+          perf record -F 99 -g -o perf.data -- revng analyze --resume=revngworkspace revng-initial-auto-analysis Schiffbruch.exe
           perf report -i perf.data > perf_report.txt
           perf script -i perf.data | FlameGraph/stackcollapse-perf.pl > out.perf-folded
           FlameGraph/flamegraph.pl out.perf-folded > flamegraph-analysis.svg
@@ -59,7 +61,7 @@ jobs:
       - name: Run decompilation
         run: |
           set -eux
-          perf record -F 99 -g -o perf.data -- revng artifact --resume=revngworkspace decompile-to-single-file DKII.EXE | revng ptml > decompiled.ptml
+          perf record -F 99 -g -o perf.data -- revng artifact --resume=revngworkspace decompile-to-single-file Schiffbruch.exe | revng ptml > decompiled.ptml
           perf report -i perf.data > perf_report.txt
           perf script -i perf.data | FlameGraph/stackcollapse-perf.pl > out.perf-folded
           FlameGraph/flamegraph.pl out.perf-folded > flamegraph-decompile.svg
