@@ -40,7 +40,8 @@ jobs:
         run: |
           set -eux
           sudo apt install -y wget 7zip
-          wget -nv -O - https://github.com/eXpl0it3r/Schiffbruch/releases/download/1.2.1/Schiffbruch-v1.2.1.7z | 7za e -si
+          wget -nv https://github.com/eXpl0it3r/Schiffbruch/releases/download/1.2.1/Schiffbruch-v1.2.1.7z
+          7za e Schiffbruch-v1.2.1.7z
           perf record -F 99 -g -o perf.data -- revng analyze --resume=revngworkspace revng-initial-auto-analysis Schiffbruch.exe
           perf report -i perf.data > perf_report.txt
           perf script -i perf.data | FlameGraph/stackcollapse-perf.pl > out.perf-folded
