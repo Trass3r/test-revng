@@ -19,7 +19,7 @@ jobs:
           sudo apt autoremove -qq azure* dotnet* google* temurin* *-jre* '*llvm*' moby*
           df -h
           cd
-          curl -L -s https://rev.ng/downloads/revng-distributable/master/install.sh | bash
+          curl -L -s https://rev.ng/downloads/revng-distributable/develop/install.sh | bash
           echo "$HOME/revng" >> $GITHUB_PATH
       - uses: pierotofy/set-swap-space@master
         with:
