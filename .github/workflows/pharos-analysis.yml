@@ -1,0 +1,42 @@
+name: Pharos Analysis
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, pharos ]
+
+jobs:
+  analyze:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { exename: BEASTS.EXE, methods: '-n 46C060 --delete-method 46C110' }
+          - { exename: DKII.EXE, methods: '-n 634E80 --delete-method 6341B0 -n 57CEB0 --delete-method 57D0B0 -n 61ECA0 --delete-method 61ED10' }
+          - { exename: patch.dll, methods: '' }
+          - { exename: QMIXER95.DLL, methods: '' }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker pull seipharos/pharos
+      - uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 64
+      - uses: catchpoint/workflow-telemetry-action@v2
+      - name: Run analysis
+        run: |
+          set -eux
+          docker run --rm -v `pwd`:/workspace -w /workspace seipharos/pharos \
+            partition --serialize=${{ matrix.exename }}.ser --maximum-memory=78000 ${{ matrix.exename }}
+          docker run --rm -v `pwd`:/workspace -w /workspace seipharos/pharos \
+            ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
+              --serialize ${{ matrix.exename }}.ser -F ${{ matrix.exename }}.facts.pl -R ${{ matrix.exename }}.results.pl -j ${{ matrix.exename }}.json \
+              ${{ matrix.methods }} \
+              --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.exename }}
+          path: |
+            ${{ matrix.exename }}.*

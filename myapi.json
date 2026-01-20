@@ -1,0 +1,166 @@
+{
+	"config": {
+		"exports": [
+			{
+				"dll": "DDRAW.DLL",
+				"export_name": "DirectDrawCreate",
+				"display_name": "DirectDrawCreate",
+				"convention": "stdcall",
+				"parameters": [
+					{
+						"name": "lpGUID",
+						"type": "GUID*",
+						"inout": "in"
+					},
+					{
+						"name": "lplpDD",
+						"type": "LPDIRECTDRAW*",
+						"inout": "out"
+					},
+					{
+						"name": "pUnkOuter",
+						"type": "IUnknown*",
+						"inout": "in"
+					}
+				],
+				"type": "HRESULT"
+			},
+			{
+				"dll": "DSOUND.DLL",
+				"export_name": "DirectSoundCreate",
+				"display_name": "DirectSoundCreate",
+				"convention": "stdcall",
+				"parameters": [
+					{
+						"name": "lpGUID",
+						"type": "GUID*",
+						"inout": "in"
+					},
+					{
+						"name": "ppDS",
+						"type": "LPDIRECTSOUND*",
+						"inout": "out"
+					},
+					{
+						"name": "pUnkOuter",
+						"type": "IUnknown*",
+						"inout": "in"
+					}
+				],
+				"type": "HRESULT"
+			},
+			{
+				"dll": "QMIXER95.DLL",
+				"export_name": "QSWaveMixInit",
+				"display_name": "QSWaveMixInit",
+				"convention": "stdcall",
+				"parameters": [
+				],
+				"type": "HQMIXER"
+			},
+			{
+				"dll": "QMIXER95.DLL",
+				"export_name": "QSWaveMixEnable",
+				"display_name": "QSWaveMixEnable",
+				"convention": "stdcall",
+				"parameters": [
+					{
+						"name": "hQMixer",
+						"type": "HQMIXER",
+						"inout": "in"
+					},
+					{
+						"name": "mode",
+						"type": "int",
+						"inout": "in"
+					}
+				],
+				"type": "MMRESULT"
+			},
+			{
+				"dll": "QMIXER95.DLL",
+				"export_name": "QSWaveMixPlay",
+				"display_name": "QSWaveMixPlay",
+				"convention": "stdcall",
+				"parameters": [
+					{
+						"name": "lpMixPlayParams",
+						"type": "MIXPLAYPARAMS*",
+						"inout": "in"
+					}
+				],
+				"type": "MMRESULT"
+			}
+		],
+		"types": {
+			"HQMIXER": "HANDLE",
+			"MMRESULT": "DWORD",
+			"QPOSITION": {
+				"type": "struct",
+				"value": [
+					{
+						"name": "azimuth",
+						"type": "int"
+					},
+					{
+						"name": "range",
+						"type": "int"
+					},
+					{
+						"name": "elevation",
+						"type": "int"
+					}
+				]
+			},
+			"MIXPLAYPARAMS": {
+				"type": "struct",
+				"value": [
+					{
+						"name": "size",
+						"type": "WORD"
+					},
+					{
+						"name": "mixSession",
+						"type": "HQMIXER"
+					},
+					{
+						"name": "channel",
+						"type": "int"
+					},
+					{
+						"name": "mixWave",
+						"type": "MIXWAVE*"
+					},
+					{
+						"name": "hWndNotify",
+						"type": "HWND"
+					},
+					{
+						"name": "flags",
+						"type": "DWORD"
+					},
+					{
+						"name": "loops",
+						"type": "WORD"
+					},
+					{
+						"name": "volume",
+						"type": "int"
+					},
+					{
+						"name": "panPos",
+						"type": "int"
+					},
+					{
+						"name": "image",
+						"type": "MIXWAVE*"
+					},
+					{
+						"name": "position",
+						"type": "QPOSITION"
+					}
+				]
+			}
+		}
+	}
+}
