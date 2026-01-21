@@ -22,7 +22,7 @@ jobs:
       - uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 64
-      - uses: mythosil/workflow-telemetry-action@v2-mermaid
+      - uses: whywaita/workflow-telemetry-action@use_quickchart
       - if: matrix.exename == 'DKII.EXE'
         run: |
           sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
