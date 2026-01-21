@@ -23,6 +23,9 @@ jobs:
         with:
           swap-size-gb: 64
       - uses: mythosil/workflow-telemetry-action@v2-mermaid
+      - if: matrix.exename == 'DKII.EXE'
+        run: |
+          sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
       - name: Run analysis
         run: |
           set -eux
