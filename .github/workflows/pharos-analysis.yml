@@ -15,9 +15,9 @@ jobs:
           - { exename: DKII.EXE, methods: '-n 634E80 --delete-method 6341B0 -n 57CEB0 --delete-method 57D0B0 -n 61ECA0 --delete-method 61ED10' }
           - { exename: patch.dll, methods: '' }
           - { exename: QMIXER95.DLL, methods: '' }
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker pull seipharos/pharos
       - uses: pierotofy/set-swap-space@master
         with:
@@ -38,7 +38,7 @@ jobs:
               --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: results-${{ matrix.exename }}
           path: |
