@@ -28,7 +28,7 @@ jobs:
           sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
       - name: Run analysis
         run: |
-          set -ux
+          set -eux
           docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
             partition --serialize=${{ matrix.exename }}.ser --maximum-memory=78000 ${{ matrix.exename }}
           docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
@@ -38,8 +38,9 @@ jobs:
               --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
           awk -F\( '{print $1}' ${{ matrix.exename }}.facts.pl | sort | uniq -c
           docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
-            ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
-              -F ${{ matrix.exename }}.facts.pl -R ${{ matrix.exename }}.results.pl -j ${{ matrix.exename }}.json
+            ooprolog --log-level=4 --facts ${{ matrix.exename }}.facts.pl --results ${{ matrix.exename }}.results.pl
+          docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
+            ooprolog --log-level=4 --results ${{ matrix.exename }}.results.pl --json ${{ matrix.exename }}.json
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v7
