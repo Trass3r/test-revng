@@ -16,30 +16,38 @@ jobs:
           - { exename: patch.dll, methods: '' }
           - { exename: QMIXER95.DLL, methods: '' }
     runs-on: ubuntu-26.04
+    env:
+      IMAGE: seipharos/pharos
     steps:
       - uses: actions/checkout@v7
-      - run: docker pull seipharos/pharos
+      - run: docker pull $IMAGE
       - uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 64
-      - uses: whywaita/workflow-telemetry-action@use_quickchart
+      - uses: ycfreeman/workflow-telemetry-action@v3.0.2
       - if: matrix.exename == 'DKII.EXE'
         run: |
           sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
-      - name: Run analysis
+      - name: partition
         run: |
           set -eux
-          docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
+          docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             partition --serialize=${{ matrix.exename }}.ser --maximum-memory=78000 ${{ matrix.exename }}
-          docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
+      - name: analysis
+        run: |
+          docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
               --serialize ${{ matrix.exename }}.ser -F ${{ matrix.exename }}.facts.pl \
               ${{ matrix.methods }} \
               --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
+      - name: ooprolog
+        run: |
           awk -F\( '{print $1}' ${{ matrix.exename }}.facts.pl | sort | uniq -c
-          docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
+          docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooprolog --log-level=4 --facts ${{ matrix.exename }}.facts.pl --results ${{ matrix.exename }}.results.pl
-          docker run --rm -v `pwd`:/workspace -w /workspace ghcr.io/trass3r/pharos:master-amd64 \
+      - name: json
+        run: |
+          docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooprolog --log-level=4 --results ${{ matrix.exename }}.results.pl --json ${{ matrix.exename }}.json
       - name: Upload artifacts
         if: always()
