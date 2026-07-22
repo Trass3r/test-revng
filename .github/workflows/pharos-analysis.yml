@@ -17,7 +17,7 @@ jobs:
           - { exename: QMIXER95.DLL, methods: '' }
     runs-on: ubuntu-26.04
     env:
-      IMAGE: seipharos/pharos
+      IMAGE: ghcr.io/trass3r/pharos:master-amd64 # seipharos/pharos
     steps:
       - uses: actions/checkout@v7
       - run: docker pull $IMAGE
