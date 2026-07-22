@@ -28,13 +28,22 @@ jobs:
       - if: matrix.exename == 'DKII.EXE'
         run: |
           sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
+      - name: Cache Artifacts
+        uses: actions/cache@v6
+        with:
+          path: |
+            *.ser
+            *.pl
+          key: artifacts-${{ matrix.exename }}-${{ github.sha }}
+          restore-keys: artifacts-${{ matrix.exename }}-
       - name: partition
         run: |
-          set -eux
+          [ -e *.ser ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             partition --serialize=${{ matrix.exename }}.ser --maximum-memory=78000 ${{ matrix.exename }}
       - name: analysis
         run: |
+          [ -e *.facts.pl ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
               --serialize ${{ matrix.exename }}.ser -F ${{ matrix.exename }}.facts.pl \
@@ -42,7 +51,8 @@ jobs:
               --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
       - name: ooprolog
         run: |
-          awk -F\( '{print $1}' ${{ matrix.exename }}.facts.pl | sort | uniq -c
+          awk -F\( '{print $1}' *.facts.pl | sort | uniq -c
+          [ -e *.results.pl ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooprolog --log-level=4 --facts ${{ matrix.exename }}.facts.pl --results ${{ matrix.exename }}.results.pl
       - name: json
