@@ -40,12 +40,12 @@ jobs:
             artifacts-${{ matrix.exename }}-
       - name: partition
         run: |
-          [ -e *.ser ] && exit 0
+          [ -s *.ser ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             partition --serialize=${{ matrix.exename }}.ser --maximum-memory=78000 ${{ matrix.exename }}
       - name: analysis
         run: |
-          [ -e *.facts.pl ] && exit 0
+          [ -s *.facts.pl ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
               --serialize ${{ matrix.exename }}.ser -F ${{ matrix.exename }}.facts.pl \
@@ -54,7 +54,7 @@ jobs:
       - name: ooprolog
         run: |
           awk -F\( '{print $1}' *.facts.pl | sort | uniq -c
-          [ -e *.results.pl ] && exit 0
+          [ -s *.results.pl ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
             ooprolog --log-level=4 --facts ${{ matrix.exename }}.facts.pl --results ${{ matrix.exename }}.results.pl
       - name: json
