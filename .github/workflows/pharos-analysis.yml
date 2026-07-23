@@ -24,7 +24,7 @@ jobs:
       - uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 64
-      - uses: ycfreeman/workflow-telemetry-action@v3.0.2
+      - uses: Trass3r/workflow-telemetry-action@master
       - if: matrix.exename == 'DKII.EXE'
         run: |
           sed -i 's/QMIXER95.DLL/QMIXER.DLL/g' myapi.json
@@ -34,8 +34,10 @@ jobs:
           path: |
             *.ser
             *.pl
-          key: artifacts-${{ matrix.exename }}-${{ github.sha }}
-          restore-keys: artifacts-${{ matrix.exename }}-
+          key: artifacts-${{ matrix.exename }}-${{ github.sha }}-${{ github.run_attempt }}
+          restore-keys: |
+            artifacts-${{ matrix.exename }}-${{ github.sha }}-
+            artifacts-${{ matrix.exename }}-
       - name: partition
         run: |
           [ -e *.ser ] && exit 0
