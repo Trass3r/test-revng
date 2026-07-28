@@ -47,7 +47,7 @@ jobs:
         run: |
           [ -s *.facts.pl ] && exit 0
           docker run --rm -v `pwd`:/workspace -w /workspace $IMAGE \
-            ooanalyzer --verbose=4 --timing --threads=4 --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
+            ooanalyzer --verbose=4 --timing --threads=`nproc` --maximum-memory=78000 --per-function-maximum-memory=20000 --per-function-timeout=10000 \
               --serialize ${{ matrix.exename }}.ser -F ${{ matrix.exename }}.facts.pl \
               ${{ matrix.methods }} \
               --apidb=contrib/winmm.json --apidb /workspace/myapi.json ${{ matrix.exename }}
