@@ -1,5 +1,8 @@
 name: Pharos Analysis
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   push:
