@@ -7,6 +7,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, pharos ]
+  schedule:
+    - cron: '0 2 * * 6'
 
 jobs:
   analyze:
